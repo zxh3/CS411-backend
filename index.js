@@ -19,6 +19,10 @@ const con = mysql.createConnection({
 
 con.connect();
 
+app.get('/', (req, res) => {
+  res.json({eatmoodBackend: 'yoxi'});
+})
+
 app.get('/dishes/:ingredientName', (req, res) => {
   const q = `SELECT dishName FROM dishIngredient WHERE ingredientName='${req.params.ingredientName}';`
   con.query(q, (err, results) => {
