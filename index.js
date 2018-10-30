@@ -9,10 +9,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 const con = mysql.createConnection({
-  host     : "localhost",
-  user     : 'root',
-  password : '1q2w3e4r!',
-  database : 'eatmood2'
+  host     : "us-cdbr-iron-east-01.cleardb.net",
+  user     : 'bc652ecfafb854',
+  password : 'efed0a43',
+  database : 'heroku_23f1595450c1c9b'
 });
 
 con.connect();
