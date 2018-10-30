@@ -17,7 +17,10 @@ const con = mysql.createConnection({
   database : 'heroku_55fd2caa4bdc19e'
 });
 
-con.connect();
+con.connect((err) => {
+  console.error(err);
+  return;
+});
 
 app.get('/', (req, res) => {
   res.json({eatmoodBackend: 'yoxi'});
@@ -104,19 +107,23 @@ app.post('/addDish', (req, res) => {
                     return;
                   } else {
                     res.json({error: err});
+                    return;
                   }
                 })
               } else {
                 res.json({error: err});
+                return;
               }
             })
           } else {
             res.json({error: err});
+            return;
           }
         });
       }
     } else {
       res.json({error: err});
+      return;
     }
   });
 });
