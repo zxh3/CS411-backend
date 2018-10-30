@@ -8,6 +8,8 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+const port = process.env.PORT || 2018;
+
 const con = mysql.createConnection({
   host     : "us-cdbr-iron-east-01.cleardb.net",
   user     : 'bc652ecfafb854',
@@ -128,4 +130,4 @@ app.put('/dishes', (req, res) => {
   });
 });
 
-app.listen(2018, () => console.log(`listening on port 2018`));
+app.listen(port, () => console.log(`listening on port ${port}`));
