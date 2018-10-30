@@ -18,8 +18,9 @@ const con = mysql.createConnection({
 });
 
 con.connect((err) => {
-  console.error(err);
-  return;
+  if (err) {
+    console.error('error !!!', err);
+  }
 });
 
 app.get('/', (req, res) => {
