@@ -16,6 +16,7 @@ const db_config = {
   password : '954e9bb3',
   database : 'heroku_55fd2caa4bdc19e'
 };
+//
 
 let con = mysql.createConnection(db_config);
 
