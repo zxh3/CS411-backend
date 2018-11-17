@@ -16,7 +16,6 @@ const db_config = {
   password : '954e9bb3',
   database : 'heroku_55fd2caa4bdc19e'
 };
-//
 
 let con = mysql.createConnection(db_config);
 
@@ -33,7 +32,7 @@ function handleDisconnect() {
                                           // If you're also serving http, display a 503 error.
   con.on('error', function(err) {
     console.log('db error', err);
-    if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
       handleDisconnect();                         // lost due to either server restart, or a
     } else {                                      // connnection idle timeout (the wait_timeout
       throw err;                                  // server variable configures this)
@@ -43,9 +42,10 @@ function handleDisconnect() {
 
 handleDisconnect();
 
+
 app.get('/', (req, res) => {
   res.json({eatmoodBackend: 'yoxi'});
-})
+});
 
 app.get('/dishes/:ingredientName', (req, res) => {
   const q = `SELECT dishName FROM dishIngredient WHERE ingredientName='${req.params.ingredientName}';`
@@ -95,6 +95,11 @@ app.get('/restaurants/:dishName', (req, res) => {
     }
   })
 });
+
+app.post('/addName', (req, res) => {
+  console.log(req.body);
+  res.json({success: 0});
+})
 
 app.post('/addDish', (req, res) => {
   let { dishName, ingredients } = req.body;
