@@ -97,6 +97,10 @@ app.get('/restaurants/:dishName', (req, res) => {
 });
 
 app.post('/addDish', (req, res) => {
+  let { email, username, password, passwordMatch } = req.body;
+  console.log(email, username, password, passwordMatch);
+});
+app.post('/addDish', (req, res) => {
   let { dishName, ingredients } = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
   ingredients = ingredients.map(x => [x]);
