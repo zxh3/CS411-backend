@@ -99,15 +99,29 @@ app.get('/restaurants/:dishName', (req, res) => {
 app.post('/authentication', (req, res) => {
   let { email, username, password, passwordMatch } = req.body;
   //console.log(email, username, password, passwordMatch);
-  let q = `INSERT INTO user (email, username, password) VALUES ?`;
+  let q = `SELECT * FROM user WHERE name='${username}'`;
   con.query(q, (err, results) => {
+    console.log('results: ', results);
     if (!err) {
-      console.log(results);
-      res.json(results);
+      if (results && results.length > 0 ) {
+        res.json({error: `username already exists.`});
+      } else {
+        
+        let q = `INSERT INTO user (email, username, password) VALUES ?`;
+
+        if (!err) {
+          console.log(results);
+          res.json(results);
+        } else {
+          res.json({error: err});
+        }
+      }
     } else {
       res.json({error: err});
+      return;
     }
-  })
+  });
+
   res.json({success: 0});
 });
 
