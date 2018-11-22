@@ -96,11 +96,6 @@ app.get('/restaurants/:dishName', (req, res) => {
   })
 });
 
-app.post('/addName', (req, res) => {
-  console.log(req.body);
-  res.json({success: 0});
-})
-
 app.post('/addDish', (req, res) => {
   let { dishName, ingredients } = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
