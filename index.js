@@ -98,7 +98,16 @@ app.get('/restaurants/:dishName', (req, res) => {
 
 app.post('/authentication', (req, res) => {
   let { email, username, password, passwordMatch } = req.body;
-  console.log(email, username, password, passwordMatch);
+  //console.log(email, username, password, passwordMatch);
+  let q = `INSERT INTO user (email, username, password) VALUES ?`;
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json(results);
+    } else {
+      res.json({error: err});
+    }
+  })
   res.json({success: 0});
 });
 
