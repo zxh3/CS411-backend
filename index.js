@@ -90,7 +90,7 @@ app.delete('/dishes/:dishName', (req, res) => {
 })
 
 app.get('/ingredients/:dishName', (req, res) => {
-  const q = `SELECT ingredientName FROM dishIngredient WHERE dishName='%${req.params.dishName}%'`;
+  const q = `SELECT ingredientName FROM dishIngredient WHERE dishName='${req.params.dishName}'`;
   con.query(q, (err, results) => {
     if (!err) {
       console.log(results);
