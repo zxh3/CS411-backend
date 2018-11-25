@@ -16,7 +16,6 @@ const db_config = {
   password : '954e9bb3',
   database : 'heroku_55fd2caa4bdc19e'
 };
-//
 
 let con = mysql.createConnection(db_config);
 
@@ -33,7 +32,7 @@ function handleDisconnect() {
                                           // If you're also serving http, display a 503 error.
   con.on('error', function(err) {
     console.log('db error', err);
-    if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
       handleDisconnect();                         // lost due to either server restart, or a
     } else {                                      // connnection idle timeout (the wait_timeout
       throw err;                                  // server variable configures this)
@@ -43,24 +42,30 @@ function handleDisconnect() {
 
 handleDisconnect();
 
+
 app.get('/', (req, res) => {
   res.json({eatmoodBackend: 'yoxi'});
-})
-
-app.get('/dishes/:ingredientName', (req, res) => {
-  const q = `SELECT dishName FROM dishIngredient WHERE ingredientName='${req.params.ingredientName}';`
-  con.query(q, (err, results) => {
-    if (!err) {
-      console.log(results);
-      res.json({results});
-    } else {
-      res.json({error: err});
-    }
-  });
 });
 
-app.get('/types/:type', (req, res)=> {
-  const q = `SELECT name FROM dish WHERE type='${req.params.type}';`
+// app.get('/dishes/:ingredientName', (req, res) => {
+//   const q = `SELECT dishName FROM dishIngredient WHERE ingredientName='${req.params.ingredientName}';`
+//   con.query(q, (err, results) => {
+//     if (!err) {
+//       console.log(results);
+//       res.json({results});
+//     } else {
+//       res.json({error: err});
+//     }
+//   });
+// });
+
+app.get('/dishes/:ingredientName', (req, res) => {
+  let ingredients = req.params.ingredientName.split(',').map(x => x.trim());
+  let i = 0;
+  q = `SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%'`;
+  for (i = 1; i < ingredients.length; i++) { 
+      q += ` AND d0.dishName IN (SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%')`;
+  }
   con.query(q, (err, results) => {
     if (!err) {
       console.log(results);
@@ -120,6 +125,51 @@ app.get('/reviews/:dishName', (req, res) => {
   })
 });
 
+app.get('/types/:type', (req, res)=> {
+  const q = `SELECT name FROM dish WHERE type='${req.params.type}';`
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json({results});
+    } else {
+      res.json({error: err});
+    }
+  });
+});
+
+// app.post('/authentication', (req, res) => {
+//   let { email, username, password, passwordMatch } = req.body;
+//   console.log(email, username, password, passwordMatch);
+//   let q = `SELECT * FROM user WHERE name='${username}'`;
+//   con.query(q, (err, results) => {
+//     console.log('results: ', results);
+//     if (!err) {
+//       if (results && results.length > 0 ) {
+//         res.json({error: `username already exists.`});
+//         return;
+//       } else {
+        
+//         q = `INSERT INTO user (email, username, password) VALUES ?`;
+//         con.query(q, (err, results) => {
+//           if (!err) {
+//             console.log('results:', results);
+//             res.json({asd: 123});
+//             return;
+//           } else {
+//             res.json({error: err});
+//             return;
+//           }
+//         });
+
+//       }
+//     } else {
+//       res.json({error: err});
+//       return;
+//     }
+
+//   });
+// });
+
 app.post('/addDish', (req, res) => {
   let { dishName, ingredients, dishType } = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
@@ -171,6 +221,49 @@ app.post('/addDish', (req, res) => {
       return;
     }
   });
+});
+
+app.post('/addDishRes', (req, res) => {
+  let { dishName, resName } = req.body;
+
+  let q = `SELECT * FROM restaurant WHERE name='${resName}'`;
+
+  con.query(q, (err, results) => {
+    if (!err) {
+      if (!results || results.length == 0) { // restaurant does not exist
+        res.json({error: `restaurant does not exist`});
+      } else {
+
+        let q1 = `SELECT * FROM dishRestaurant WHERE restaurantName='${resName}' AND dishName='${dishName}'`;
+
+          con.query(q1, (err, results) => {
+            if (!err) {
+              if (results && results.length > 0) { // dishRestaurant already exists
+                res.json({error: `Restaurant exists for this dish`});
+              } else {
+
+                let q2 = `INSERT INTO dishRestaurant VALUES ('${dishName}', '${resName}');`;
+                
+                con.query(q2, (err) => {
+                  if (!err) {
+                    console.log('success addDish');
+                    res.json({success: 0});
+                    return;
+                  } else {
+                    res.json({error:err});
+                    return;
+                  }
+                });
+              }
+            } else {
+              res.json({error: err});
+              return;
+            }
+          });
+      }
+    }
+  });
+
 });
 
 app.put('/dishes', (req, res) => {
