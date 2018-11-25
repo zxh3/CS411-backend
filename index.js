@@ -211,6 +211,49 @@ app.post('/addDish', (req, res) => {
   });
 });
 
+app.post('/addDishRes', (req, res) => {
+  let { dishName, resName } = req.body;
+
+  let q = `SELECT * FROM restaurant WHERE name='${resName}'`;
+
+  con.query(q, (err, results) => {
+    if (!err) {
+      if (!results || results.length == 0) { // restaurant does not exist
+        res.json({error: `restaurant does not exist`});
+      } else {
+
+        let q1 = `SELECT * FROM dishRestaurant WHERE restaurantName='${resName}' AND dishName='${dishName}'`;
+
+          con.query(q1, (err, results) => {
+            if (!err) {
+              if (results && results.length > 0) { // dishRestaurant already exists
+                res.json({error: `Restaurant exists for this dish`});
+              } else {
+
+                let q2 = `INSERT INTO dishRestaurant VALUES ('${dishName}', '${resName}');`;
+                
+                con.query(q2, (err) => {
+                  if (!err) {
+                    console.log('success addDish');
+                    res.json({success: 0});
+                    return;
+                  } else {
+                    res.json({error:err});
+                    return;
+                  }
+                });
+              }
+            } else {
+              res.json({error: err});
+              return;
+            }
+          });
+      }
+    }
+  });
+
+});
+
 app.put('/dishes', (req, res) => {
   const oldName = req.body.oldName;
   const newName = req.body.newName;
