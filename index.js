@@ -59,6 +59,18 @@ app.get('/dishes/:ingredientName', (req, res) => {
   });
 });
 
+app.get('/types/:type', (req, res)=> {
+  const q = `SELECT name FROM dish WHERE type='${req.params.type}';`
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json({results});
+    } else {
+      res.json({error: err});
+    }
+  });
+});
+
 app.delete('/dishes/:dishName', (req, res) => {
   const q = `DELETE FROM dish WHERE name='${req.params.dishName}'`;
   console.log(q);
@@ -96,8 +108,20 @@ app.get('/restaurants/:dishName', (req, res) => {
   })
 });
 
+app.get('/reviews/:dishName', (req, res) => {
+  const q = `SELECT content, rating FROM review r JOIN dishReview d ON r.id = d.reviewid WHERE dishName='${req.params.dishName}'`;
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json(results);
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
 app.post('/addDish', (req, res) => {
-  let { dishName, ingredients } = req.body;
+  let { dishName, ingredients, dishType } = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
   ingredients = ingredients.map(x => [x]);
   console.log('dishName: ', dishName);
@@ -113,7 +137,7 @@ app.post('/addDish', (req, res) => {
         res.json({error: `Dish already exists.`});
       } else {
         
-        let q1 = `INSERT INTO dish VALUES ('${dishName}');`;
+        let q1 = `INSERT INTO dish VALUES ('${dishName}', '${dishType}');`;
         let q2 = `INSERT IGNORE INTO ingredient (name) VALUES ?`;
         let q3 = `INSERT IGNORE INTO dishIngredient (dishName, ingredientName) VALUES ?`;
 
