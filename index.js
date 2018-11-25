@@ -47,8 +47,25 @@ app.get('/', (req, res) => {
   res.json({eatmoodBackend: 'yoxi'});
 });
 
+// app.get('/dishes/:ingredientName', (req, res) => {
+//   const q = `SELECT dishName FROM dishIngredient WHERE ingredientName='${req.params.ingredientName}';`
+//   con.query(q, (err, results) => {
+//     if (!err) {
+//       console.log(results);
+//       res.json({results});
+//     } else {
+//       res.json({error: err});
+//     }
+//   });
+// });
+
 app.get('/dishes/:ingredientName', (req, res) => {
-  const q = `SELECT dishName FROM dishIngredient WHERE ingredientName='${req.params.ingredientName}';`
+  var ingredients = req.params.ingredientName.split(',');
+  var i = 0;
+  q = `SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%'`;
+  for (i = 1; i < ingredients.length; i++) { 
+      q += ` AND d0.dishName IN (SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%')`;
+  }
   con.query(q, (err, results) => {
     if (!err) {
       console.log(results);
@@ -73,7 +90,7 @@ app.delete('/dishes/:dishName', (req, res) => {
 })
 
 app.get('/ingredients/:dishName', (req, res) => {
-  const q = `SELECT ingredientName FROM dishIngredient WHERE dishName='${req.params.dishName}'`;
+  const q = `SELECT ingredientName FROM dishIngredient WHERE dishName='%${req.params.dishName}%'`;
   con.query(q, (err, results) => {
     if (!err) {
       console.log(results);
@@ -96,34 +113,38 @@ app.get('/restaurants/:dishName', (req, res) => {
   })
 });
 
-app.post('/authentication', (req, res) => {
-  let { email, username, password, passwordMatch } = req.body;
-  console.log(email, username, password, passwordMatch);
-  // let q = `SELECT * FROM user WHERE name='${username}'`;
-  // con.query(q, (err, results) => {
-  //   console.log('results: ', results);
-  //   if (!err) {
-  //     if (results && results.length > 0 ) {
-  //       res.json({error: `username already exists.`});
-  //     } else {
+// app.post('/authentication', (req, res) => {
+//   let { email, username, password, passwordMatch } = req.body;
+//   console.log(email, username, password, passwordMatch);
+//   let q = `SELECT * FROM user WHERE name='${username}'`;
+//   con.query(q, (err, results) => {
+//     console.log('results: ', results);
+//     if (!err) {
+//       if (results && results.length > 0 ) {
+//         res.json({error: `username already exists.`});
+//         return;
+//       } else {
         
-  //       let q = `INSERT INTO user (email, username, password) VALUES ?`;
+//         q = `INSERT INTO user (email, username, password) VALUES ?`;
+//         con.query(q, (err, results) => {
+//           if (!err) {
+//             console.log('results:', results);
+//             res.json({asd: 123});
+//             return;
+//           } else {
+//             res.json({error: err});
+//             return;
+//           }
+//         });
 
-  //       if (!err) {
-  //         console.log(results);
-  //         res.json(results);
-  //       } else {
-  //         res.json({error: err});
-  //       }
-  //     }
-  //   } else {
-  //     res.json({error: err});
-  //     return;
-  //   }
-  // });
+//       }
+//     } else {
+//       res.json({error: err});
+//       return;
+//     }
 
-  res.json({success: 0});
-});
+//   });
+// });
 
 app.post('/addDish', (req, res) => {
   let { dishName, ingredients } = req.body;
