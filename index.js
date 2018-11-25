@@ -159,7 +159,7 @@ app.get('/types/:type', (req, res)=> {
 // });
 
 app.post('/addDish', (req, res) => {
-  let { dishName, ingredients } = req.body;
+  let { dishName, ingredients, dishType } = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
   ingredients = ingredients.map(x => [x]);
   console.log('dishName: ', dishName);
@@ -175,7 +175,7 @@ app.post('/addDish', (req, res) => {
         res.json({error: `Dish already exists.`});
       } else {
         
-        let q1 = `INSERT INTO dish VALUES ('${dishName}');`;
+        let q1 = `INSERT INTO dish VALUES ('${dishName}', '${dishType}');`;
         let q2 = `INSERT IGNORE INTO ingredient (name) VALUES ?`;
         let q3 = `INSERT IGNORE INTO dishIngredient (dishName, ingredientName) VALUES ?`;
 
