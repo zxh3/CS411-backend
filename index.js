@@ -60,8 +60,11 @@ app.get('/', (req, res) => {
 // });
 
 app.get('/dishes/:ingredientName', (req, res) => {
-  var ingredients = req.params.ingredientName.split(',');
-  var i = 0;
+  //var ingredients = req.params.ingredientName.split(',');
+  let ingredients = req.params.ingredientName.split(',').map(x => x.trim());
+  // let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
+  // ingredients = ingredients.map(x => [x]);
+  let i = 0;
   q = `SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%'`;
   for (i = 1; i < ingredients.length; i++) { 
       q += ` AND d0.dishName IN (SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%')`;
