@@ -60,10 +60,7 @@ app.get('/', (req, res) => {
 // });
 
 app.get('/dishes/:ingredientName', (req, res) => {
-  //var ingredients = req.params.ingredientName.split(',');
   let ingredients = req.params.ingredientName.split(',').map(x => x.trim());
-  // let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
-  // ingredients = ingredients.map(x => [x]);
   let i = 0;
   q = `SELECT d${i}.dishName FROM dishIngredient AS d${i} WHERE d${i}.ingredientName LIKE '%${ingredients[i]}%'`;
   for (i = 1; i < ingredients.length; i++) { 
@@ -114,6 +111,18 @@ app.get('/restaurants/:dishName', (req, res) => {
       res.json({error: err});
     }
   })
+});
+
+app.get('/types/:type', (req, res)=> {
+  const q = `SELECT name FROM dish WHERE type='${req.params.type}';`
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json({results});
+    } else {
+      res.json({error: err});
+    }
+  });
 });
 
 // app.post('/authentication', (req, res) => {
