@@ -306,4 +306,37 @@ app.put('/dishes', (req, res) => {
   });
 });
 
+app.get('/user/:email', (req, res) => {
+  console.log('email: ', req.params.email);
+  const q = `SELECT email from user WHERE email='${req.params.email}'`
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({success: result});
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
+app.post('/user', (req, res) => {
+  let { email, name, imageUrl } = req.body;
+  if (email === undefined || name === undefined) {
+    res.json({error: 'field cannot be empty'});
+  } else {
+    let q = ''
+    if (imageUrl === undefined) {
+      q = `INSERT IGNORE INTO user(email, name) VALUES ('${email}', '${name}')`
+    } else {
+      q = `INSERT IGNORE INTO user VALUES ('${email}', '${name}', '${imageUrl}')`
+    }
+    con.query(q, (err, result) => {
+      if (!err) {
+        res.json({success: result});
+      } else {
+        res.json({error: err});
+      }
+    })
+  }
+})
+
 app.listen(port, () => console.log(`listening on port ${port}`));
