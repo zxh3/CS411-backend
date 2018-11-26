@@ -149,39 +149,6 @@ app.get('/types/:type', (req, res)=> {
   });
 });
 
-// app.post('/authentication', (req, res) => {
-//   let { email, username, password, passwordMatch } = req.body;
-//   console.log(email, username, password, passwordMatch);
-//   let q = `SELECT * FROM user WHERE name='${username}'`;
-//   con.query(q, (err, results) => {
-//     console.log('results: ', results);
-//     if (!err) {
-//       if (results && results.length > 0 ) {
-//         res.json({error: `username already exists.`});
-//         return;
-//       } else {
-        
-//         q = `INSERT INTO user (email, username, password) VALUES ?`;
-//         con.query(q, (err, results) => {
-//           if (!err) {
-//             console.log('results:', results);
-//             res.json({asd: 123});
-//             return;
-//           } else {
-//             res.json({error: err});
-//             return;
-//           }
-//         });
-
-//       }
-//     } else {
-//       res.json({error: err});
-//       return;
-//     }
-
-//   });
-// });
-
 app.post('/addDish', (req, res) => {
   let { dishName, ingredients, dishType } = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
@@ -384,6 +351,103 @@ app.post('/user', (req, res) => {
       }
     })
   }
+});
+
+
+app.get('/usercollection/:email', (req, res) => {
+  let q = `SELECT collectionid FROM usercollection WHERE email='${req.params.email}'`
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({result: result});
+    } else {
+      res.json({error: err});
+    }
+  });
+});
+
+app.get('/collectiondish/:id', (req, res) => {
+  let q = `SELECT dishName FROM dishcollection WHERE collectionid='${req.params.id}'`;
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({result: result});
+    } else {
+      res.json({error: err});
+    }
+  });
+});
+
+app.get('/collectionname/:id', (req, res) => {
+  let q = `SELECT collectionName FROM collection WHERE id='${req.params.id}'`;
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({result: result});
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
+app.post('/addcollection', (req, res) => {
+  let { email, collectionName } = req.body;
+  
+  let q1 = `SELECT MAX(id) FROM collection`;
+  
+  con.query(q1, (err, result) => {
+    if (!err) {
+      let nextId = result[0]['MAX(id)'] + 1;
+      let q2 = `INSERT INTO collection VALUES (${nextId}, '${collectionName}')`;
+      con.query(q2, (err, result) => {
+        if (!err) {
+          let q3 = `INSERT INTO usercollection VALUES ('${email}', ${nextId})`;
+          con.query(q3, (err, result) => {
+            if (!err) {
+              res.json({success: 0});
+            } else {
+              res.json({error: err});
+            }
+          })
+        } else {
+          res.json({error: err});
+        }
+      })
+    } else {
+      res.json({error: err});
+    }
+  })
 })
+
+app.delete('/deletecollection/:id', (req, res) => {
+  let q = `DELETE FROM collection WHERE id=${req.params.id}`;
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({sucess: 0});
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
+app.get('/getallusercollection/:email', (req, res) => {
+  let q = `select collection.id, collection.collectionName from usercollection join collection on collection.id = usercollection.collectionid where usercollection.email = '${req.params.email}'`;
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({result: result});
+    } else {
+      res.json({error: err});
+    }
+  });
+});
+
+app.post('/addtocollection', (req, res) => {
+  let { dishName, collectionid } = req.body;
+  let q = `INSERT IGNORE INTO dishcollection VALUES ('${dishName}', ${collectionid})`
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({success: 0});
+    } else {
+      res.json({error: err})
+    }
+  });
+});
 
 app.listen(port, () => console.log(`listening on port ${port}`));
