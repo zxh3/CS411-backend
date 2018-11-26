@@ -113,6 +113,18 @@ app.get('/restaurants/:dishName', (req, res) => {
   })
 });
 
+app.get('/dishes/restaurants/:resName', (req, res) => {
+  const q = `SELECT * FROM restaurant WHERE name='${req.params.resName}'`;
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json(results);
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
 app.get('/reviewsName/:dishName', (req, res) => {
   const q = `SELECT reviewid FROM dishreview WHERE dishName='${req.params.dishName}'`;
   con.query(q, (err, results) => {
