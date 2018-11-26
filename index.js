@@ -113,6 +113,18 @@ app.get('/restaurants/:dishName', (req, res) => {
   })
 });
 
+app.get('/dishes/restaurants/:resName', (req, res) => {
+  const q = `SELECT * FROM restaurant WHERE name='${req.params.resName}'`;
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json(results);
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
 app.get('/reviewsName/:dishName', (req, res) => {
   const q = `SELECT reviewid FROM dishreview WHERE dishName='${req.params.dishName}'`;
   con.query(q, (err, results) => {
@@ -204,24 +216,27 @@ app.post('/addDish', (req, res) => {
 
 app.post('/addReview', (req, res) => {
   let { dishName, reviewContent, dishRating } = req.body;
-  let reviewId = Math.floor(Math.random()*100000) + 1;
-  console.log('dishName: ', dishName);
-  console.log('reviewID: ', reviewId);
-  console.log('reviewContent: ', reviewContent);
-  reviewId = query_reviewId(reviewId);
-  if (reviewId < 0) {
-    res.json({error: "error"});
-    return;
-  } else {
-    let q1 = `INSERT INTO review VALUES ('${reviewId}', '${reviewContent}', '${dishRating}');`;
-    let q2 =`INSERT IGNORE INTO dishReview VALUES ('${reviewId}', '${dishName}')`;
+  // console.log('dishName: ', dishName);
+  // console.log('reviewContent: ', reviewContent);
+    let q1 = `INSERT INTO review (content, rating) VALUES ('${reviewContent}', '${dishRating}');`;
     con.query(q1, (err) => {
       if (!err) {
-        con.query(q2, (err) => {
-          if (!err) {
-            console.log('success addReview');
-            res.json({success: 0});
-            return;
+        let q2 = `SELECT LAST_INSERT_ID()`;
+        con.query(q2, (err, results) => {
+          if (!err){
+              //console.log("lastinsertid: ", results[0]['LAST_INSERT_ID()']);
+              let rid = results[0]['LAST_INSERT_ID()'];
+              let q3 =`INSERT INTO dishReview VALUES ('${rid}', '${dishName}')`;
+              con.query(q3, (err) => {
+                if (!err) {
+                  console.log('success addReview');
+                  res.json({success: 0});
+                  return;
+                } else {
+                  res.json({error: err});
+                  return;
+                }
+              });
           } else {
             res.json({error: err});
             return;
@@ -232,25 +247,7 @@ app.post('/addReview', (req, res) => {
         return;
       }
     });
-  }
 });
-
-function query_reviewId(id){
-  let q = `SELECT * FROM review WHERE id='${id}'`;
-  con.query(q, (err, results) => {
-    if (!err) {
-      if (results && results.length > 0 ) {
-        console.log(result);
-        id = Math.floor(Math.random()*100000) + 1;
-        return query_reviewId(id);
-      } else {
-        return id;
-      }
-    } else {
-      return -1;
-    }
-  });
-}
 
 app.get('/reviews/:dishName', (req, res) => {
   const q = `SELECT content, rating FROM review r JOIN dishReview d ON r.id = d.reviewid WHERE dishName='${req.params.dishName}'`;
