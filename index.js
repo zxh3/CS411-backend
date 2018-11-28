@@ -214,7 +214,7 @@ app.post('/addDish', (req, res) => {
   });
 });
 
-app.post('/addReview', (req, res) => {
+app.post('/dishes/addReview', (req, res) => {
   let { dishName, reviewContent, dishRating } = req.body;
   // console.log('dishName: ', dishName);
   // console.log('reviewContent: ', reviewContent);
@@ -229,7 +229,39 @@ app.post('/addReview', (req, res) => {
               let q3 =`INSERT INTO dishReview VALUES ('${rid}', '${dishName}')`;
               con.query(q3, (err) => {
                 if (!err) {
-                  console.log('success addReview');
+                  console.log('success addDishReview');
+                  res.json({success: 0});
+                  return;
+                } else {
+                  res.json({error: err});
+                  return;
+                }
+              });
+          } else {
+            res.json({error: err});
+            return;
+          }
+        })
+      } else {
+        res.json({error: err});
+        return;
+      }
+    });
+});
+
+app.post('/restaurants/addReview', (req, res) => {
+  let { resName, reviewContent, resRating } = req.body;
+    let q1 = `INSERT INTO review (content, rating) VALUES ('${reviewContent}', '${resRating}');`;
+    con.query(q1, (err) => {
+      if (!err) {
+        let q2 = `SELECT LAST_INSERT_ID()`;
+        con.query(q2, (err, results) => {
+          if (!err){
+              let rid = results[0]['LAST_INSERT_ID()'];
+              let q3 =`INSERT INTO restaurantReview VALUES ('${rid}', '${resName}')`;
+              con.query(q3, (err) => {
+                if (!err) {
+                  console.log('success addResReview');
                   res.json({success: 0});
                   return;
                 } else {
