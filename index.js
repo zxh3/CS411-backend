@@ -282,8 +282,20 @@ app.post('/restaurants/addReview', (req, res) => {
     });
 });
 
-app.get('/reviews/:dishName', (req, res) => {
+app.get('/reviews/dishes/:dishName', (req, res) => {
   const q = `SELECT content, rating FROM review r JOIN dishReview d ON r.id = d.reviewid WHERE dishName='${req.params.dishName}'`;
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json(results);
+    } else {
+      res.json({error: err});
+    }
+  })
+});
+
+app.get('/reviews/restaurants/:resName', (req, res) => {
+  const q = `SELECT content, rating FROM review r JOIN restaurantReview d ON r.id = d.reviewid WHERE restaurantName='${req.params.resName}'`;
   con.query(q, (err, results) => {
     if (!err) {
       console.log(results);
