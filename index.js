@@ -365,6 +365,8 @@ app.post('/recommend', (req, res) => {
   let { email, dishName } = req.body;
   let q1 = `SELECT c.id FROM userCollection AS u JOIN collection AS c ON u.collectionId = c.id WHERE u.email='${email}' AND c.collectionName='Recommend'`;
   con.query(q1, (err, results) => {
+    // res.json({error: `test`,results: results,email,dishName});
+    // return;
     if (!err) {
       if (!results || results.length == 0) { // user does not exist
         res.json({error: `user does not exist`,
