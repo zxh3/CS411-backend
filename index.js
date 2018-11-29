@@ -162,8 +162,20 @@ app.get('/types/:type', (req, res)=> {
   });
 });
 
+app.get('/image/:dishName', (req, res)=> {
+  const q = `SELECT image FROM dish WHERE name='${req.params.dishName}';`
+  con.query(q, (err, results) => {
+    if (!err) {
+      console.log(results);
+      res.json({results});
+    } else {
+      res.json({error: err});
+    }
+  });
+});
+
 app.post('/addDish', (req, res) => {
-  let { dishName, ingredients, dishType } = req.body;
+  let { dishName, ingredients, dishType, image} = req.body;
   let dishIngredient = ingredients.map(ingredient => [dishName, ingredient]);
   ingredients = ingredients.map(x => [x]);
   console.log('dishName: ', dishName);
@@ -179,7 +191,7 @@ app.post('/addDish', (req, res) => {
         res.json({error: `Dish already exists.`});
       } else {
         
-        let q1 = `INSERT INTO dish VALUES ('${dishName}', '${dishType}');`;
+        let q1 = `INSERT INTO dish VALUES ('${dishName}', '${dishType}', '${image}');`;
         let q2 = `INSERT IGNORE INTO ingredient (name) VALUES ?`;
         let q3 = `INSERT IGNORE INTO dishIngredient (dishName, ingredientName) VALUES ?`;
 
