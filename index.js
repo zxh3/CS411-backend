@@ -568,4 +568,18 @@ app.post('/addtocollection', (req, res) => {
   });
 });
 
+app.post('/deletecollectionitem', (req, res) => {
+  let { dishName, collectionid } = req.body;
+  let q = `DELETE FROM dishcollection WHERE collectionid=${collectionid} AND dishName='${dishName}'`
+  con.query(q, (err, result) => {
+    if (!err) {
+      res.json({result: result});
+    } else {
+      res.json({error: err});
+    }
+  });
+})
+
+
+
 app.listen(port, () => console.log(`listening on port ${port}`));
