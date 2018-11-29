@@ -371,7 +371,7 @@ app.post('/recommend', (req, res) => {
       } else {
         console.log(results[0]['id']);
         let cid = results[0]['id'];
-        let q2 = `INSERT IGNORE INTO dishCollection VALUES ('${cid}', '${dishName}')`
+        let q2 = `INSERT IGNORE INTO dishCollection VALUES ('${dishName}', '${cid}')`
         con.query(q2, (err, results) => {
           if (!err) {
             res.json({success: 0});
