@@ -448,50 +448,6 @@ app.post('/user', (req, res) => {
   }
 });
 
-// app.post('/user', (req, res) => {
-//   let { email, name, imageUrl } = req.body;
-//   if (email === undefined || name === undefined) {
-//     res.json({error: 'field cannot be empty'});
-//   } else {
-//     let q1 = ''
-//     if (imageUrl === undefined) {
-//       q1 = `INSERT IGNORE INTO user(email, name) VALUES ('${email}', '${name}')`
-//     } else {
-//       q1 = `INSERT IGNORE INTO user VALUES ('${email}', '${name}', '${imageUrl}')`
-//     }
-//     con.query(q1, (err, result) => {
-//       if (!err) {
-//         let collectionName = "Recommend";
-//         let q2 = `SELECT MAX(id) FROM collection`;
-//         con.query(q2, (err, result) => {
-//           if (!err) {
-//             let nextId = result[0]['MAX(id)'] + 1;
-//             let q3 = `INSERT INTO collection VALUES (${nextId}, '${collectionName}')`;
-//             con.query(q3, (err, result) => {
-//               if (!err) {
-//                 let q4 = `INSERT INTO usercollection VALUES ('${email}', ${nextId})`;
-//                 con.query(q4, (err, result) => {
-//                   if (!err) {
-//                     res.json({success: 0});
-//                   } else {
-//                     res.json({error: err});
-//                   }
-//                 })
-//               } else {
-//                 res.json({error: err});
-//               }
-//             })
-//           } else {
-//             res.json({error: err});
-//           }
-//         })
-//       } else {
-//         res.json({error: err});
-//       }
-//     })
-//   }
-// });
-
 
 app.get('/usercollection/:email', (req, res) => {
   let q = `SELECT collectionid FROM usercollection WHERE email='${req.params.email}'`
