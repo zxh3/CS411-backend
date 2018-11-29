@@ -361,6 +361,30 @@ app.post('/addDishRes', (req, res) => {
 
 });
 
+app.post('/recommend', (req, res) => {
+  let { email, dishName } = req.body;
+  let q1 = `SELECT c.id FROM userCollection AS u JOIN collection AS c ON u.collectionId = c.id WHERE u.email='${email}' AND c.collectionName='Recommend'`;
+  con.query(q1, (err, results) => {
+    if (!err) {
+      if (!results || results.length == 0) { // user does not exist
+        res.json({error: `user does not exist`});
+      } else {
+        console.log(results[0]['id']);
+        let cid = results[0]['id'];
+        let q2 = `INSERT IGNORE INTO dishCollection VALUES ('${cid}', '${dishName}')`
+        con.query(q2, (err, results) => {
+          if (!err) {
+            res.json({success: 0});
+          } else {
+            res.json({error: err});
+          }
+        })              
+      }
+    }
+  });
+
+});
+
 app.put('/dishes', (req, res) => {
   const oldName = req.body.oldName;
   const newName = req.body.newName;
@@ -391,15 +415,38 @@ app.post('/user', (req, res) => {
   if (email === undefined || name === undefined) {
     res.json({error: 'field cannot be empty'});
   } else {
-    let q = ''
+    let q1 = ''
     if (imageUrl === undefined) {
-      q = `INSERT IGNORE INTO user(email, name) VALUES ('${email}', '${name}')`
+      q1 = `INSERT IGNORE INTO user(email, name) VALUES ('${email}', '${name}')`
     } else {
-      q = `INSERT IGNORE INTO user VALUES ('${email}', '${name}', '${imageUrl}')`
+      q1 = `INSERT IGNORE INTO user VALUES ('${email}', '${name}', '${imageUrl}')`
     }
-    con.query(q, (err, result) => {
+    con.query(q1, (err, result) => {
       if (!err) {
-        res.json({success: result});
+        let collectionName = "Recommend";
+        let q2 = `SELECT MAX(id) FROM collection`;
+        con.query(q2, (err, result) => {
+          if (!err) {
+            let nextId = result[0]['MAX(id)'] + 1;
+            let q3 = `INSERT INTO collection VALUES (${nextId}, '${collectionName}')`;
+            con.query(q3, (err, result) => {
+              if (!err) {
+                let q4 = `INSERT INTO usercollection VALUES ('${email}', ${nextId})`;
+                con.query(q4, (err, result) => {
+                  if (!err) {
+                    res.json({success: 0});
+                  } else {
+                    res.json({error: err});
+                  }
+                })
+              } else {
+                res.json({error: err});
+              }
+            })
+          } else {
+            res.json({error: err});
+          }
+        })
       } else {
         res.json({error: err});
       }
