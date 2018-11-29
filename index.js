@@ -374,31 +374,18 @@ app.post('/addDishRes', (req, res) => {
 });
 
 app.post('/recommend', (req, res) => {
-  let { email, dishName } = req.body;
-  let q1 = `SELECT c.id FROM userCollection AS u JOIN collection AS c ON u.collectionId = c.id WHERE u.email='${email}' AND c.collectionName='Recommend'`;
+  let { email, dishName, recommender } = req.body;
+  let q1 = `INSERT INTO recommend VALUES ('${email}', '${dishName}', '${recommender}')`
+ 
   con.query(q1, (err, results) => {
     // res.json({error: `test`,results: results,email,dishName});
     // return;
     if (!err) {
-      if (!results || results.length == 0) { // user does not exist
-        res.json({error: `user does not exist`,
-                  results: results,
-                  email,
-                  dishName});
-      } else {
-        console.log(results[0]['id']);
-        let cid = results[0]['id'];
-        let q2 = `INSERT IGNORE INTO dishCollection VALUES ('${dishName}', '${cid}')`
-        con.query(q2, (err, results) => {
-          if (!err) {
-            res.json({success: 0});
-          } else {
-            res.json({error: err});
-          }
-        })              
-      }
+      res.json({success: 0});
+    } else {
+      res.json({error: err});
     }
-  });
+  })      
 
 });
 
