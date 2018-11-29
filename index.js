@@ -367,7 +367,10 @@ app.post('/recommend', (req, res) => {
   con.query(q1, (err, results) => {
     if (!err) {
       if (!results || results.length == 0) { // user does not exist
-        res.json({error: `user does not exist`});
+        res.json({error: `user does not exist`,
+                  results: results,
+                  email,
+                  dishName});
       } else {
         console.log(results[0]['id']);
         let cid = results[0]['id'];
