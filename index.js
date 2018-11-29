@@ -243,7 +243,7 @@ app.post('/dishes/addReview', (req, res) => {
   let { dishName, reviewContent, dishRating } = req.body;
   // console.log('dishName: ', dishName);
   // console.log('reviewContent: ', reviewContent);
-    let q1 = `INSERT INTO review (content, rating) VALUES ('${reviewContent}', '${dishRating}');`;
+    let q1 = `INSERT INTO review (content, rating) VALUES ("${reviewContent}", '${dishRating}');`;
     con.query(q1, (err) => {
       if (!err) {
         let q2 = `SELECT LAST_INSERT_ID()`;
