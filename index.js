@@ -375,7 +375,7 @@ app.post('/addDishRes', (req, res) => {
 
 app.post('/recommend', (req, res) => {
   let { email, dishName, recommender } = req.body;
-  let q1 = `INSERT INTO recommend VALUES ('${email}', '${dishName}', ${recommender}')`
+  let q1 = `INSERT INTO recommend VALUES ('${email}', '${dishName}', '${recommender}')`
  
   con.query(q1, (err, results) => {
     // res.json({error: `test`,results: results,email,dishName});
